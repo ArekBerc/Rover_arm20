@@ -27,6 +27,8 @@ class robotic_arm():
 	a=[0,400,0,150,0,0]
 	d = [0,0,300,0,100,0]
 	alpha=[3*pi/4,0,3*pi/4,pi/2,3*pi/4,0]"""
+	
+	# Lengths for the links are estimated values.
 	t=[t1,(pi/2)+t2,(pi/2)+t3,t4,(pi/2)+t5,0]
 	a =[0,400,300,0,0,0]
 	d = [0,0,0,150,0,100]
