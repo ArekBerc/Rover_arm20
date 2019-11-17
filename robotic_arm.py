@@ -5,7 +5,7 @@ from sympy import *
 
 
 class robotic_arm():
-	"""docstring for ClassName"""
+
 	t1 =Symbol('t1', real=True)
 	t2 =Symbol('t2', real=True)
 	t3 =Symbol('t3', real=True)
