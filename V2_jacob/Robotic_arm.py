@@ -9,11 +9,7 @@ class Robotic_arm:
 		self.offset=offset
 		self.qc=qc
 		self.typee=typee
-		self.jac=jac
+		self.jac={0}
 		self.T=T
 		self.ub=ub
 		self.lb=lb
-
-		
-
-
