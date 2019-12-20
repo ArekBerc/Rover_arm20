@@ -3,7 +3,7 @@ from Robotic_arm import *
 
 
 def f_kine(r,q):
-	temp=np.ones((4,4,),dtype=float)
+	temp=np.identity(4)
 	T=np.zeros((4,4,4))
 	for i in range(4):
 		if r.typee[i]=='r':
@@ -22,7 +22,7 @@ def f_kine(r,q):
 		[0 , sa , ca , r.d[i]] ,
 		[0 , 0 , 0 , 1]]))
 
-	T[:,:,i]=temp
+		T[i]=temp
 
 
 # CHECK THE NOTATIONS LATER !!!!!!
@@ -34,7 +34,7 @@ def f_kine(r,q):
 
 
 
-
+	#print(T[:,:,3])
 	return T
 
 
@@ -45,9 +45,9 @@ def f_kine_ee(r,q):
 
 	R=T[:3,:3,3]
 
-	p=np.array([[T[0,3,3]],
-		[T[1,3,3]],
-		[T[2,3,3]]])
+	p=np.array([[T[3,0,3]],
+		[T[3,1,3]],
+		[T[3,2,3]]])
 
 	return R,p
 
@@ -57,12 +57,12 @@ def jac(r,q):
 	epsilon_inv=1/epsilon
 
 	g0,f0=f_kine_ee(r,q)
-	qc0=q
+	qc1=np.copy(q)
 
 	jac=np.zeros((3,4))
 	for i in range(4):
-		q = qc0
-		q[i] = qc0[i] + epsilon
+		q = np.copy(qc1)
+		q[i] = epsilon + qc1[i]
 		#print(q[1])
 		g1,f1=f_kine_ee(r,q)
 
@@ -71,7 +71,7 @@ def jac(r,q):
 		#print(f1)
 
 		for j in range(3):
-			jac[j][i]=(f0[j]-f1[j]) * epsilon_inv
+			jac[j][i]=(f1[j]-f0[j]) * epsilon_inv
 
 			#print("burasi f0")
 			#print(f0)
