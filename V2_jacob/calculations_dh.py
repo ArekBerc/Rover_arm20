@@ -4,14 +4,14 @@ from Robotic_arm import *
 
 def f_kine(r,q):
 	temp=np.identity(4)
-	T=np.zeros((4,4,4))
-	for i in range(4):
+	T=np.zeros((6,4,4))
+	for i in range(6):
 		if r.typee[i]=='r':
 			r.theta[i]=q[i]
 		elif r.typee[i]=='p':
 			r.d[i]=q[i]
 
-	for i in range(4):
+	for i in range(6):
 		ct=np.cos(r.theta[i]+r.offset[i])
 		st=np.sin(r.theta[i]+r.offset[i])
 		ca=np.cos(r.alpha[i])
@@ -29,7 +29,7 @@ def f_kine(r,q):
 
 
 	for i in range(4):
-		for j in range(4):
+		for j in range(6):
 			T[j,3,i]=T[j,3,i] + r.base[j]
 
 
@@ -43,7 +43,7 @@ def f_kine_ee(r,q):
 
 	T=f_kine(r,q)
 
-	R=T[:3,:3,3]
+	R=T[3,:3,3]
 
 	p=np.array([[T[3,0,3]],
 		[T[3,1,3]],
@@ -59,8 +59,8 @@ def jac(r,q):
 	g0,f0=f_kine_ee(r,q)
 	qc1=np.copy(q)
 
-	jac=np.zeros((3,4))
-	for i in range(4):
+	jac=np.zeros((3,6))
+	for i in range(6):
 		q = np.copy(qc1)
 		q[i] = epsilon + qc1[i]
 		#print(q[1])
@@ -79,7 +79,12 @@ def jac(r,q):
 	#print(jac)
 	return jac
 
-def selfUpdate(r, qc):
-    r.qc = qc;
-    r.T = f_kine(r, qc);
-    r.jac = jac(r, qc);
+def selfUpdater(r, q):
+	r.qc=np.copy(q)
+	r.T=f_kine(r,q)
+	r.jac=jac(r,q)
+	return r
+#    r.qc = np.copy(q)
+#    r.T = f_kine(r, q)
+#    r.jac = jac(r, q)
+#	return r

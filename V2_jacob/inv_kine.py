@@ -22,22 +22,19 @@ def inv_kine(r, p, treshold=0.01, max_iter=1000):
 
         delta_angle = np.dot(inv_jacob, delta_pos)
 
-        for i in range(4):
+        for i in range(6):
             q[i] = q[i] + delta_angle[i][0]
-        for i in range(4):
+        for i in range(6):
             if (q[i] < r.lb[i]):
                 q[i] = r.lb[i]
             if (q[i] > r.ub[i]):
                 q[i] = r.ub[i]
 
         y, x = f_kine_ee(r, q)
-        print(q)
-        print(p)
         delta_pos = np.subtract(p, x)
         jacob = jac(r, q)
 
         err = np.linalg.norm(delta_pos)
-        print(err)
         if err < treshold or current_iter > max_iter:
             break
 
