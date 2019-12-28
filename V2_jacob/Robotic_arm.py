@@ -13,4 +13,4 @@ class Robotic_arm:
 		self.T=T
 		self.ub=ub
 		self.lb=lb
-		self.xp=0
+		self.pubme=[]
