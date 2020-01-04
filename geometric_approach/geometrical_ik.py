@@ -6,24 +6,38 @@ from random import randint
 from sensor_msgs.msg import Joy
 from calculations import *
 from Arm import *
+import time
 
-x=0
-y=0
-z=0
-w=0
+flag=False
+x=54.0
+y=50.0
+z=0.0
+w=0.0
 def callback(data):
-	global x,y,z,w
+	global x,y,z,w,flag
 	xi=-data.axes[0]*0.15
 	yi=data.axes[3]*0.15
 	zi=-data.axes[2]*0.15
-	if data.buttons[4]==1:
+	print(flag)
+	while data.buttons[4]==1:
+		if flag==False:
+			flag=True
+			print("mode 1")
+			break
+		elif flag==True:
+			flag=False
+			print("mode 2")
+			break
+
+	if flag==True:
+
 		#w=arm.initial_angles[4]-arm.joint_angles[4]
 		w=data.axes[1]
 		arm.joint_angles[4]=arm.joint_angles[4]+w*0.0085
 		x=x+xi
 		z=z+zi
 		y=y+yi
-		movement_2(arm,[54.0+x,50.0+y,0.0+z])
+		movement_2(arm,[x,y,z])
 
 	else:
 
@@ -39,7 +53,7 @@ def callback(data):
 #		print("hiziniz 102 yavas amk")
 		z=z+zi
 		print(arm.joint_angles[1])
-		movement_1(arm,[54.0+x,50.0+y,0.0+z])
+		movement_1(arm,[x,y,z])
 	arm_pub = [arm.initial_angles[0]-arm.joint_angles[0],arm.initial_angles[1]-arm.joint_angles[1],arm.initial_angles[2]-arm.joint_angles[2],arm.initial_angles[3]-arm.joint_angles[3],arm.initial_angles[4]-arm.joint_angles[4],arm.initial_angles[5]-arm.joint_angles[5]]
 	print("s")
 	print(arm_pub[0])
@@ -97,7 +111,6 @@ def movement_2(r,destination_point):
 	second_joint=angles[2]
 	a=sqrt( (distance ** 2)-(destination_point[1] ** 2))
 	base_yaw=asin(destination_point[2]/a)
-	#for making parallel
 	r.joint_angles[1]=base_pitch
 	r.joint_angles[2]=second_joint
 	r.joint_angles[0]=base_yaw
