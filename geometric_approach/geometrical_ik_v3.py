@@ -13,19 +13,22 @@ flag=False
 x=54.0
 y=50.0
 z=0.0
-w=0.0
 xi=0.0
 yi=0.0
 zi=0.0
 button=0.0
-
+pitch=0.0
+yaw=0.0
+roll=0.0
 def callback(data):
-	global x,xi,y,yi,z,zi,w,flag,button
+	global xi,yi,zi,flag,button,pitch,yaw,roll
 	button=data.buttons[4]
-	xi=-data.axes[0]*0.05
-	yi=data.axes[3]*0.05
-	zi=-data.axes[2]*0.05
-	w=data.axes[1]*0.0035
+	xi=data.axes[1]*0.02
+	yi=data.axes[3]*0.02
+	zi=-data.axes[2]*0.02
+	pitch=-data.axes[5]*0.00035
+	yaw=data.axes[0]*0.00035
+	roll=-data.axes[4]*0.0008
 
 
 
@@ -73,7 +76,7 @@ if __name__ == '__main__':
 	pub5 = rospy.Publisher('/rover_arm_eksen5_joint_position_controller/command', F64, queue_size=1)
 	pub6 = rospy.Publisher('/rover_arm_eksen6_joint_position_controller/command', F64, queue_size=1)
 	rospy.Subscriber("joy",Joy,callback)
-	rate=rospy.Rate(110)
+	rate=rospy.Rate(150)
 
 
 	while not rospy.is_shutdown():
@@ -90,16 +93,18 @@ if __name__ == '__main__':
 				print("mode 2")
 				break
 
-		if flag==True:
+#		if flag==True:
+#
+#			#w=arm.initial_angles[4]-arm.joint_angles[4]
+#
+#			arm.initial_angles[4]=arm.initial_angles[4]-direction1
+#			arm.initial_angles[3]=arm.initial_angles[3]+direction2
+#
+#			movement_2(arm,[x,y,z])
+#
+#		else:
 
-			#w=arm.initial_angles[4]-arm.joint_angles[4]
 
-			arm.joint_angles[4]=arm.joint_angles[4]+w
-			movement_2(arm,[x,y,z])
-
-		else:
-
-			w=arm.initial_angles[4]-arm.joint_angles[4]
 		#if(arm.joint_angles[1]>0.90 or xi<0):
 
 	#	else:
@@ -109,8 +114,16 @@ if __name__ == '__main__':
 	#	else:
 	#		print("hiziniz 102 yavas amk")
 			#print(arm.joint_angles[1])
-			movement_1(arm,[x,y,z])
+		movement_1(arm,[x,y,z])
+		arm.initial_angles[4]=arm.initial_angles[4]+pitch
+		arm.initial_angles[3]=arm.initial_angles[3]+yaw
+		arm.initial_angles[5]=arm.initial_angles[5]+roll
+
+
 		arm_pub = [arm.initial_angles[0]-arm.joint_angles[0],arm.initial_angles[1]-arm.joint_angles[1],arm.initial_angles[2]-arm.joint_angles[2],arm.initial_angles[3]-arm.joint_angles[3],arm.initial_angles[4]-arm.joint_angles[4],arm.initial_angles[5]-arm.joint_angles[5]]
+		print("Gripper pitch %d ",np.degrees(arm.initial_angles[4]))
+		print("Gripper yaw %d ",np.degrees(arm.initial_angles[3]))
+		print("Gripper roll %d ",np.degrees(arm.initial_angles[5]))
 
 		pub1.publish(arm_pub[0])
 		pub2.publish(arm_pub[1])
@@ -119,4 +132,3 @@ if __name__ == '__main__':
 		pub5.publish(arm_pub[4])
 		pub6.publish(arm_pub[5])
 		rate.sleep()
-	rospy.spin()
