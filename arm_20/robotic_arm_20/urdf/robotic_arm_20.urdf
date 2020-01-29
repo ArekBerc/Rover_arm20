@@ -117,7 +117,7 @@
     <limit
       lower="-3.14"
       upper="3.14"
-      effort="100"
+      effort="200"
       velocity="20" />
   </joint>
   <link
@@ -175,7 +175,7 @@
     <limit
       lower="-3.14"
       upper="3.14"
-      effort="100"
+      effort="200"
       velocity="20" />
   </joint>
   <link
@@ -233,7 +233,7 @@
     <limit
       lower="-3.14"
       upper="3.14"
-      effort="100"
+      effort="200"
       velocity="20" />
   </joint>
   <link
@@ -291,7 +291,7 @@
     <limit
       lower="-3.14"
       upper="3.14"
-      effort="100"
+      effort="200"
       velocity="20" />
   </joint>
   <link
@@ -349,7 +349,7 @@
     <limit
       lower="-3.14"
       upper="3.14"
-      effort="100"
+      effort="200"
       velocity="20" />
   </joint>
   <link
@@ -407,7 +407,7 @@
     <limit
       lower="-3.14"
       upper="3.14"
-      effort="100"
+      effort="200"
       velocity="20" />
   </joint>
 
@@ -477,9 +477,81 @@
     </actuator>
   </transmission>
 
-  <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+ <link name="camera">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+    </collision>
 
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.005 0.005 0.005"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+
+    <inertial>
+      <mass value="0.1" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <box_inertia m="0.1" x="0.05" y="0.05" z="0.05" />
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <axis xyz="1 1 0" />
+    <origin xyz="0.4 0 0.2" rpy="1.57 0 0"/>
+    <parent link="link_4"/>
+    <child link="camera"/>
+  </joint>
+
+   <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+  <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+  <legacyModeNS>true</legacyModeNS>
     </plugin>
-  </gazebo>
+</gazebo>
+	<gazebo reference="camera">
+       <sensor type="camera" name="camera">
+         <update_rate>30.0</update_rate>
+         <camera name="camera">
+           <horizontal_fov>1.3962634</horizontal_fov>
+           <image>
+             <width>800</width>
+             <height>800</height>
+             <format>R8G8B8</format>
+           </image>
+           <clip>
+             <near>0.02</near>
+             <far>300</far>
+           </clip>
+           <noise>
+             <type>gaussian</type>
+             <!-- Noise is sampled independently per pixel on each frame.
+                  That pixel's noise value is added to each of its color
+                  channels, which at that point lie in the range [0,1]. -->
+             <mean>0.0</mean>
+             <stddev>0.007</stddev>
+           </noise>
+         </camera>
+         <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+           <legacyModeNS>true</legacyModeNS>
+           <alwaysOn>true</alwaysOn>
+           <updateRate>0.0</updateRate>
+           <cameraName>/mybot/camera</cameraName>
+           <imageTopicName>camera_view</imageTopicName>
+           <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+           <frameName>camera</frameName>
+           <hackBaseline>0.07</hackBaseline>
+           <distortionK1>0.0</distortionK1>
+           <distortionK2>0.0</distortionK2>
+           <distortionK3>0.0</distortionK3>
+           <distortionT1>0.0</distortionT1>
+           <distortionT2>0.0</distortionT2>
+         </plugin>
+       </sensor>
+     </gazebo>
 </robot>
